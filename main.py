@@ -8,7 +8,7 @@ def parseData(startDate, endDate, unit):
         save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
 
         move_one_date()
-        date += 1
+        date += 1 
     return
 
 from selenium import webdriver
