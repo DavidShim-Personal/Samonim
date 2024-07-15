@@ -3,22 +3,21 @@ def parseData(startDate, endDate, unit):
     # unit: monthly, weekly, yearly
     # initialize(unit)
     date = startDate
-    while date < endDate: # 1. 하준
-        info = parse_one_page() # 2. 한휘
-        save_to_excel(info, unit) # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
+    while date < endDate:  # 1. 하준
+        info = parse_one_page()  # 2. 한휘
+        save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
 
         move_one_date()
         date += 1
     return
 
 
-def parse_one_page(): # 한휘
+def parse_one_page():  # 한휘
     info = []
     return info
 
 
-def save_to_excel(info): # 동혁
-
+def save_to_excel(info):  # 동혁
     return
 
 
@@ -41,7 +40,7 @@ def test_data(cnt):
     # cnt만큼 샘플 생성
     # OpenAI API를 통해서 chatbot한테 말 걸기
     # cnt횟수만큼 반복
-    # word 파일에 
+    # word 파일에 저장
     return
 
 
