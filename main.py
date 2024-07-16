@@ -5,26 +5,6 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-def parseData(startDate, endDate, unit):
-    # startDate, endDate
-    # unit: monthly, weekly, yearly
-    date = startDate
-
-    # init driver and open rorkr
-    driver = initialize_driver()
-    url = 'http://rorkr.com/'  # 데이터를 추출할 웹사이트의 URL
-    driver.get(url)
-
-    # repeat for several pages
-    while date < endDate:  # 1. 하준
-        info = parse_one_page(driver)  # 2. 한휘
-        save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
-
-        move_one_date()
-        date += 1
-    return
-
-
 def initialize_driver():
     # 크롬 웹드라이버 설정
     chrome_options = Options()
@@ -64,6 +44,29 @@ def move_one_date():
     # 2-1. 다음이 10 이하면 article 누러주기
     # 2-2. 10초과면: 다음페이지 넘어가기 버튼 누르고, 혀냊 page는 1번으로 초기화
     return
+
+
+def parseData(startDate, endDate, unit):
+    # startDate, endDate
+    # unit: monthly, weekly, yearly
+    date = startDate
+
+    # init driver and open rorkr
+    driver = initialize_driver()
+    url = 'http://rorkr.com/'  # 데이터를 추출할 웹사이트의 URL
+    driver.get(url)
+
+    # repeat for several pages
+    while date < endDate:  # 1. 하준
+        info = parse_one_page(driver)  # 2. 한휘
+        save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
+
+        move_one_date()
+        date += 1
+    return
+
+
+# parseData("", "", "")
 
 
 ##############################################
