@@ -1,38 +1,42 @@
-def parseData(startDate, endDate, unit):
-    # startDate, endDate
-    # unit: monthly, weekly, yearly
-    # initialize(unit)
-    date = startDate
-    while date < endDate:  # 1. 하준
-        info = parse_one_page()  # 2. 한휘
-        save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
-
-        move_one_date()
-        date += 1 
-    return
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
-# 크롬 웹드라이버 설정
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # 브라우저 창을 열지 않고 실행하기 위한 옵션
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
 
-# 웹드라이버 실행
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+def parseData(startDate, endDate, unit):
+    # startDate, endDate
+    # unit: monthly, weekly, yearly
+    date = startDate
 
-# 웹사이트 열기
-url = 'http://rorkr.com/%eb%8b%b9%ec%8b%a0%ec%9d%98-%ed%97%8c%ea%b8%88%ec%9d%84-%ea%b3%84%ed%9a%8d%ed%95%98%ec%8b%ad%ec%8b%9c%ec%98%a4/'  # 데이터를 추출할 웹사이트의 URL
-driver.get(url)
+    # init driver and open rorkr
+    driver = initialize_driver()
+    url = 'http://rorkr.com/'  # 데이터를 추출할 웹사이트의 URL
+    driver.get(url)
+
+    # repeat for several pages
+    while date < endDate:  # 1. 하준
+        info = parse_one_page(driver)  # 2. 한휘
+        save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
+
+        move_one_date()
+        date += 1
+    return
 
 
+def initialize_driver():
+    # 크롬 웹드라이버 설정
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # 브라우저 창을 열지 않고 실행하기 위한 옵션
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
 
-def parse_one_page():  # 한휘
+    # 웹드라이버 실행
+    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+
+
+def parse_one_page(driver):  # 한휘
     # 데이터 추출
     date = driver.find_elements(By.XPATH, '/html/body/div/div/div/div/div/main/article/header/div/span[1]/a/time[1]')
     title = driver.find_elements(By.XPATH, '/html/body/div/div/div/div/div/main/article/header/h1')
@@ -71,10 +75,12 @@ def train_data(startDate, endDate):
     # 3. API 호출하여 학습
     return
 
+
 def make_single_qt(filename, date):
     # 1. OpenAI API를 통해 말씀의 실재 1일치 생성
     # 2. 제목, 날짜, 내용 등을 Word 문서 형태에 맞게 저장 (filename 파일에 concat)
     return
+
 
 def make_multiple_qt(cnt):
     # 1. filename 워드 파일 생성
