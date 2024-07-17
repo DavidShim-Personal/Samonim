@@ -1,3 +1,6 @@
+import pandas as pd
+import os
+
 def parseData(startDate, endDate, unit):
     # startDate, endDate
     # unit: monthly, weekly, yearly
@@ -16,9 +19,38 @@ def parse_one_page():  # 한휘
     info = []
     return info
 
+ # 동혁
 
-def save_to_excel(info):  # 동혁
-    return
+def save_to_excel(array_of_strings, file_name):
+    # 새로운 데이터 프레임 생성
+    new_df = pd.DataFrame([array_of_strings])
+    
+    if os.path.exists(file_name):
+        # 기존 파일이 존재하면 파일을 읽어옵니다.
+        existing_df = pd.read_excel(file_name, header=None)
+        # 기존 데이터에 새로운 데이터를 추가합니다.
+        updated_df = pd.concat([existing_df, new_df], ignore_index=True)
+    else:
+        # 파일이 존재하지 않으면 새로운 데이터 프레임을 사용합니다.
+        updated_df = new_df
+    
+    # 엑셀 파일에 데이터 저장
+    updated_df.to_excel(file_name, index=False, header=False)
+
+# 사용 예제
+array_of_strings1 = ["정보1", "정보2", "정보3", "정보4"]
+array_of_strings2 = ["정보5", "정보6", "정보7", "정보8"]
+file_name = "output.xlsx"
+
+save_to_excel(array_of_strings1, file_name)
+save_to_excel(array_of_strings2, file_name)
+
+def save_to_excel(data, file_name='output.xlsx', sheet_name='Sheet1'):
+    df = pd.DataFrame([data])
+    df.to_excel(file_name, index=False, header=False, sheet_name=sheet_name)
+    
+    data = ["이름", "나이", "직업"]
+    save_to_excel(data, 'example.xlsx')
 
 
 def move_one_date():
