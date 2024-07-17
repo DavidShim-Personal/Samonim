@@ -28,7 +28,6 @@ def parse_one_page(driver):  # 한휘
 
     # 드라이버 종료
     driver.quit()
-    print("Hello world")
     print(data)
     info = [data]
     return info
