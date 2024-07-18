@@ -41,17 +41,19 @@ def save_to_excel(array_of_strings, file_name):
     else:
         # 파일이 존재하지 않으면 새로운 데이터 프레임을 사용합니다.
         updated_df = new_df
-    
-    # 엑셀 파일에 데이터 저장
-    updated_df.to_excel(file_name, index=False, header=False)
 
-# 사용 예제
+    #파일에 데이터 저장 (처음에 한번은 파일을 만들어주고, 이후 부터는 이 df 변수를 갖고 있어서 매번 concat만)
+    updated_df.to_excel(file_name, index=False, header=False)
+    
+    #테스트 코드 제거
+    
 array_of_strings1 = ["정보1", "정보2", "정보3", "정보4"]
 array_of_strings2 = ["정보5", "정보6", "정보7", "정보8"]
 file_name = "output.xlsx"
 
-save_to_excel(array_of_strings1, file_name)
-save_to_excel(array_of_strings2, file_name)
+save_to_excel(array_of_strings1, file_name) 
+# save_to_excel 2개에서 1개로 줄임
+
 
 # move_one_date 함수의 주석과 코드를 문자열로 변환
 move_one_date_code = """
