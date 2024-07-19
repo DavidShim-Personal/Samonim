@@ -44,8 +44,8 @@ def save_to_excel(info):  # 동혁
 
 
 def move_one_date():
-    site = driver.find_element(By.XPATH, '/html/body/div/div/div/div/div/main/nav/div/div[1]')
-    site.click()
+    next_button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div/div/main/nav/div/div/a')
+    next_button.click()
 
 
 def days_between_dates(start_date_str, end_date_str):
@@ -80,7 +80,7 @@ def parse_data(starting_date, ending_date, unit):
         # info = parse_one_page()  # 2. 한휘
         # save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
 
-        # move_one_date()
+        move_one_date()
         date1 -= 1
         print(date1)
 
@@ -145,7 +145,6 @@ print('Start parse_data')
 parse_data("2024 07 19", "2024 07 20", "")
 time.sleep(3)
 print('Start move_one_date')
-move_one_date()
 time.sleep(3)
 print('End Program')
 time.sleep(3)
