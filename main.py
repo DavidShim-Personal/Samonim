@@ -3,6 +3,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+from datetime import datetime
+import time
 
 
 def initialize_driver():
@@ -39,34 +44,43 @@ def save_to_excel(info):  # 동혁
 
 
 def move_one_date():
-    # 1. 뒤로 가기
-    # 2. 다음 날짜 찾기
-    # 2-1. 다음이 10 이하면 article 누러주기
-    # 2-2. 10초과면: 다음페이지 넘어가기 버튼 누르고, 혀냊 page는 1번으로 초기화
-    return
+    site = driver.find_element(By.XPATH, '/html/body/div/div/div/div/div/main/nav/div/div[1]')
+    site.click()
 
 
-def parseData(startDate, endDate, unit):
+def days_between_dates(start_date_str, end_date_str):
+    date_format = "%Y %m %d"
+
+    try:
+        start_date = datetime.strptime(start_date_str, date_format)
+        end_date = datetime.strptime(end_date_str, date_format)
+
+        # 두 날짜 간의 차이 계산
+        delta = end_date - start_date
+
+        # delta.days를 통해 일 수를 구할 수 있음
+        return delta.days
+
+    except ValueError:
+        return "올바른 날짜 형식이 아닙니다."
+
+
+def parse_data(starting_date, ending_date, unit):
     # startDate, endDate
     # unit: monthly, weekly, yearly
-    date = startDate
-
-    # init driver and open rorkr
-    driver = initialize_driver()
-    url = 'http://rorkr.com/'  # 데이터를 추출할 웹사이트의 URL
-    driver.get(url)
+    date1 = days_between_dates(starting_date, ending_date)
+    enter = driver.find_element(By.XPATH, '/html/body/div/div/div/div/div/main/article[1]')
+    enter.click()
 
     # repeat for several pages
-    while date < endDate:  # 1. 하준
-        info = parse_one_page(driver)  # 2. 한휘
-        save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
+    while date1 > 0:
+        time.sleep(3)
 
-        move_one_date()
-        date += 1
-    return
+        # info = parse_one_page()  # 2. 한휘
+        # save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
 
-
-# parseData("", "", "")
+        # move_one_date()
+        date1 -= 1
 
 
 ##############################################
@@ -103,3 +117,30 @@ def automate_qt():
 # pull: repository -> local
 # commit: 작업한 걸 -> local (작업 단위로 commit) #comment
 # # push: local -> Repository (하루 단위로 push 한다)
+
+
+print('Program started')
+driver = initialize_driver()
+url = 'http://rorkr.com/'  # 데이터를 추출할 웹사이트의 URL
+print('Try opening rorkr')
+driver.get(url)
+
+
+print('Start try')
+try:
+    # WebDriverWait를 사용하여 요소가 나타날 때까지 기다립니다 (예: 10초)
+    element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div/div/div/main/nav/div/div[1]'))
+    )
+
+except Exception as e:
+    print(e)  # 오류 메시지 출력
+
+finally:
+    driver.quit()
+
+print('Start parse_data')
+parse_data("2024 07 19", "2024 07 16", "")
+print('Start move_one_date')
+move_one_date()
+print('End Program')
