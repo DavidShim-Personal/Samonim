@@ -13,7 +13,7 @@ import time
 def initialize_driver():
     # 크롬 웹드라이버 설정
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # 브라우저 창을 열지 않고 실행하기 위한 옵션
+    # chrome_options.add_argument("--headless")  # 브라우저 창을 열지 않고 실행하기 위한 옵션
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
 
@@ -69,7 +69,8 @@ def parse_data(starting_date, ending_date, unit):
     # startDate, endDate
     # unit: monthly, weekly, yearly
     date1 = days_between_dates(starting_date, ending_date)
-    enter = driver.find_element(By.XPATH, '/html/body/div/div/div/div/div/main/article[1]')
+    print(date1)
+    enter = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div/div/main/article[1]/header/h3/a')
     enter.click()
 
     # repeat for several pages
@@ -81,6 +82,7 @@ def parse_data(starting_date, ending_date, unit):
 
         # move_one_date()
         date1 -= 1
+        print(date1)
 
 
 ##############################################
@@ -124,23 +126,26 @@ driver = initialize_driver()
 url = 'http://rorkr.com/'  # 데이터를 추출할 웹사이트의 URL
 print('Try opening rorkr')
 driver.get(url)
+time.sleep(5)
 
 
 print('Start try')
 try:
     # WebDriverWait를 사용하여 요소가 나타날 때까지 기다립니다 (예: 10초)
     element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div/div/div/main/nav/div/div[1]'))
+        EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div/div/div/main/article[1]/header/h3/a'))
     )
 
 except Exception as e:
     print(e)  # 오류 메시지 출력
-
-finally:
-    driver.quit()
+    print("End with error")
+    quit()
 
 print('Start parse_data')
-parse_data("2024 07 19", "2024 07 16", "")
+parse_data("2024 07 19", "2024 07 20", "")
+time.sleep(3)
 print('Start move_one_date')
 move_one_date()
+time.sleep(3)
 print('End Program')
+time.sleep(3)
