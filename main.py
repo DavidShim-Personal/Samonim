@@ -43,12 +43,14 @@ def save_to_excel(info):  # 동혁
     return
 
 
-def move_one_date():
+def move_one_date(driver):
     next_button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div/div/main/nav/div/div/a')
     next_button.click()
 
 
 def days_between_dates(start_date_str, end_date_str):
+    print('[DBG] Start date is ' + start_date_str)
+    print('[DBG] End date is ' + end_date_str)
     date_format = "%Y %m %d"
 
     try:
@@ -59,7 +61,7 @@ def days_between_dates(start_date_str, end_date_str):
         delta = end_date - start_date
 
         # delta.days를 통해 일 수를 구할 수 있음
-        return delta.days
+        return delta.days + 1
 
     except ValueError:
         return "올바른 날짜 형식이 아닙니다."
@@ -68,22 +70,42 @@ def days_between_dates(start_date_str, end_date_str):
 def parse_data(starting_date, ending_date, unit):
     # startDate, endDate
     # unit: monthly, weekly, yearly
-    date1 = days_between_dates(starting_date, ending_date)
-    print(date1)
-    enter = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div/div/main/article[1]/header/h3/a')
-    enter.click()
+
+    # open Page
+    print('[DBG] Opening rorkr')
+    driver = initialize_driver()
+    url = 'http://rorkr.com/'  # 데이터를 추출할 웹사이트의 URL
+    driver.get(url)
+
+    FIRST_PAGE_TAG = '/html/body/div[1]/div/div/div/div/main/article[1]/header/h3/a'
+
+    # Wait for page to open
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, FIRST_PAGE_TAG))
+    )
+
+    # open first page
+    first_page_btn = driver.find_element(By.XPATH, FIRST_PAGE_TAG)
+    first_page_btn.click()
+
+    date_cnt = days_between_dates(starting_date, ending_date)
+    print('[DBG] date_cnt is ' + str(date_cnt))
+    
 
     # repeat for several pages
-    while date1 > 0:
-        time.sleep(3)
+    while date_cnt > 0:
+        time.sleep(3)  # [TODO] Delete after debugging is done
 
         # info = parse_one_page()  # 2. 한휘
         # save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
 
-        move_one_date()
-        date1 -= 1
-        print(date1)
+        move_one_date(driver)
+        date_cnt -= 1
+        print('[DBG] date_cnt is ' + str(date_cnt))
 
+
+parse_data("2024 07 19", "2024 07 20", "")
+print('End Program')
 
 ##############################################
 
@@ -119,32 +141,3 @@ def automate_qt():
 # pull: repository -> local
 # commit: 작업한 걸 -> local (작업 단위로 commit) #comment
 # # push: local -> Repository (하루 단위로 push 한다)
-
-
-print('Program started')
-driver = initialize_driver()
-url = 'http://rorkr.com/'  # 데이터를 추출할 웹사이트의 URL
-print('Try opening rorkr')
-driver.get(url)
-time.sleep(5)
-
-
-print('Start try')
-try:
-    # WebDriverWait를 사용하여 요소가 나타날 때까지 기다립니다 (예: 10초)
-    element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div/div/div/main/article[1]/header/h3/a'))
-    )
-
-except Exception as e:
-    print(e)  # 오류 메시지 출력
-    print("End with error")
-    quit()
-
-print('Start parse_data')
-parse_data("2024 07 19", "2024 07 20", "")
-time.sleep(3)
-print('Start move_one_date')
-time.sleep(3)
-print('End Program')
-time.sleep(3)
