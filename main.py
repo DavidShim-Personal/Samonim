@@ -3,12 +3,17 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+from datetime import datetime
+import time
 
 
 def initialize_driver():
     # 크롬 웹드라이버 설정
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # 브라우저 창을 열지 않고 실행하기 위한 옵션
+    # chrome_options.add_argument("--headless")  # 브라우저 창을 열지 않고 실행하기 위한 옵션
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
 
@@ -38,36 +43,69 @@ def save_to_excel(info):  # 동혁
     return
 
 
-def move_one_date():
-    # 1. 뒤로 가기
-    # 2. 다음 날짜 찾기
-    # 2-1. 다음이 10 이하면 article 누러주기
-    # 2-2. 10초과면: 다음페이지 넘어가기 버튼 누르고, 혀냊 page는 1번으로 초기화
-    return
+def move_one_date(driver):
+    next_button = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div/div/main/nav/div/div/a')
+    next_button.click()
 
 
-def parseData(startDate, endDate, unit):
+def days_between_dates(start_date_str, end_date_str):
+    print('[DBG] Start date is ' + start_date_str)
+    print('[DBG] End date is ' + end_date_str)
+    date_format = "%Y %m %d"
+
+    try:
+        start_date = datetime.strptime(start_date_str, date_format)
+        end_date = datetime.strptime(end_date_str, date_format)
+
+        # 두 날짜 간의 차이 계산
+        delta = end_date - start_date
+
+        # delta.days를 통해 일 수를 구할 수 있음
+        return delta.days + 1
+
+    except ValueError:
+        return "올바른 날짜 형식이 아닙니다."
+
+
+def parse_data(starting_date, ending_date, unit):
     # startDate, endDate
     # unit: monthly, weekly, yearly
-    date = startDate
 
-    # init driver and open rorkr
+    # open Page
+    print('[DBG] Opening rorkr')
     driver = initialize_driver()
     url = 'http://rorkr.com/'  # 데이터를 추출할 웹사이트의 URL
     driver.get(url)
 
+    FIRST_PAGE_TAG = '/html/body/div[1]/div/div/div/div/main/article[1]/header/h3/a'
+
+    # Wait for page to open
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, FIRST_PAGE_TAG))
+    )
+
+    # open first page
+    first_page_btn = driver.find_element(By.XPATH, FIRST_PAGE_TAG)
+    first_page_btn.click()
+
+    date_cnt = days_between_dates(starting_date, ending_date)
+    print('[DBG] date_cnt is ' + str(date_cnt))
+    
+
     # repeat for several pages
-    while date < endDate:  # 1. 하준
-        info = parse_one_page(driver)  # 2. 한휘
-        save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
+    while date_cnt > 0:
+        time.sleep(3)  # [TODO] Delete after debugging is done
 
-        move_one_date()
-        date += 1
-    return
+        # info = parse_one_page()  # 2. 한휘
+        # save_to_excel(info, unit)  # 3. 동혁. unit은 기본 1달치, 첫 도전은 1달치
+
+        move_one_date(driver)
+        date_cnt -= 1
+        print('[DBG] date_cnt is ' + str(date_cnt))
 
 
-# parseData("", "", "")
-
+parse_data("2024 07 19", "2024 07 20", "")
+print('End Program')
 
 ##############################################
 
